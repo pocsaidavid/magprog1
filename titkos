@@ -1,0 +1,8 @@
+89 83 19 90 80 91 23 89 75 18 91 91 82 79
+ha nem az hogy
+
+A program megpróbál minden lehetséges 8 számjegyű kulcsot, és megnézi, hogy melyikkel lesz értelmes magyar szöveg.
+Maga a titkosítás egy ismétlődő kulcsos XOR. A kulcs 8 karakterből áll, amelyek '0-9', és ha a szöveg hosszabb 8 karakternél, a kulcs újraindul.
+A main() standard inputról olvassa be a a fájlt és ez kerül a titkos bufferbe. Valamint legenerálja minden 8-jegyű kulcsot.
+Minden kulccsal XOR-olja a szöveget, és ha az értelmes, kiírja a kulcsot és a szöveget,majd vissza XOR-olja.
+Úgy dönti el, hogy értelmes-e a szöveg, hogy megnézi, hogy a szó hány karakterből áll (átlagos magyar szó hossza 6 és 9 karakter között van), és hogy tartalmaz-e gyakran használt magyar szavakat.
