@@ -1,0 +1,27 @@
+1.Feladat
+
+  1.Változó Vlad
+  2.Pointer Pete
+  3.Xerox Chad
+  4.Key Dealer Kevin
+  5.Null Nick
+  6.Scope Sensei
+  7.Generic Greg
+  8.Recursion Rick
+
+2.Feladat
+
+  1. void valtoztat(int x) { x = 999; } int chad = 5; valtoztat(chad);
+// chad értéke még mindig: 5
+
+  2. int ertek = 55; int* pete = &ertek; *pete = 77; printf("%d", ertek);
+// kimenet: 77
+
+  3. int osszeg(int n) { if (n == 0) return 0; // base case return n + osszeg(n - 1); }
+// osszeg(4) = 4+3+2+1+0 = 10
+
+3.Feladat
+
+  1. Segfault Samu
+  2. Memory Leak Miki
+  3. Stack Overflow Stan
