@@ -1,14 +1,14 @@
 1.Feladat
 
-  1.Osztály Olga
-  2.Példányosító Pál
-  3.Konstruktor Kristóf
-  4.Destruktor Dezső
-  5.Öröklődő Olivér
-  6.Interfész István
-  7.Polimorf Péter
-  8.Bezáró Bence
-  9.Late Binding Lajos
+  1.Class/Osztály Olga
+  2.Instantation/Példányosító Pál
+  3.Constructor/Konstruktor Kristóf
+  4.Destructor/Destruktor Dezső
+  5.Inheritance/Öröklődő Olivér
+  6.Interface/Interfész István
+  7.Polymorphism/Polimorf Péter
+  8.Encapsulation/Bezáró Bence
+  9.Dynamic Dispatch/Late Binding Lajos
 
 2.Feladat
 
