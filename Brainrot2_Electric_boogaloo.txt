@@ -1,0 +1,37 @@
+1.Feladat
+
+  1.Osztály Olga
+  2.Példányosító Pál
+  3.Konstruktor Kristóf
+  4.Destruktor Dezső
+  5.Öröklődő Olivér
+  6.Interfész István
+  7.Polimorf Péter
+  8.Bezáró Bence
+  9.Late Binding Lajos
+
+2.Feladat
+
+  1. class Auto { public: std::string marka; int* ev; // konstruktor (inicializálja marka-t és foglalja le az ev-et heap-en): Auto(std::string m) { marka = m; ev = new int(2024); }
+// destruktor (szabadítsa fel ev-et): ~Auto() { delete ev; } };
+
+
+  2. class BankSzamla { int egyenleg = 0; // Belülről látszik, kívülről nem: private int hitelkeret = 50000; // Leszármazott is látja, kívülső nem: protected void befizet(int x);
+// Mindenki hívhatja: public };
+
+  3. Allat* allatok[] = { new Kutya(), new Macska(), new Kutya() }; for (auto* a : allatok) a->hangotAd();
+// Kimenetek sorban: Vau!,Miau!,Vau!
+
+
+3.Feladat
+
+  X: Interfész István, mert csak pure virtual-t tartalmaz
+  Y: Abstrakt Anikó, mert tartalmaz közös kódot ÉS pure virtual-t
+
+4.Feladat
+
+  1.EARLY
+  2.LATE
+  3.EARLY
+  4.EARLY
+  5.LATE
