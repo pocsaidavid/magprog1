@@ -1,0 +1,95 @@
+#include <iostream>
+
+struct A {
+    public:
+     int a;
+     int b;
+};
+
+void q(A*d,int l) {
+    int i, j, t;
+    for (i = 0; i < l; i++){
+        for (j = 0; j < l - 1; j++){
+            if (d[j].a>d[j+1].a){
+                t = d[j].a;
+                d[j].a = d[j+1].a;
+                d[j+1].a = t;
+                t = d[j].b;
+                d[j].b = d[j+1].b;
+                d[j+1].b = t;
+            }
+        }
+    }
+}
+
+
+void x() {
+    std::cout<<"==="<<std::endl;
+}
+
+void y() {
+    std::cout<<"---"<<std::endl;
+}
+
+void z() {
+    std::cout<<"Output:"<<std::endl;
+}
+
+
+void h(A*a,int s) {
+    int i = 0;
+    int r = 0;
+    int u = 0;
+    int v = 0;
+    for (i = 0; i < s; i++) {
+        r = a[i].a;
+        u = a[i].b;
+        if (r % 2 == 0) {
+            if (u % 2 == 0) {
+                v = r * u;
+            } else {
+                v = r + u;
+            }
+        } else {
+            if (u % 2 == 0) {
+                v = r - u;
+            } else {
+                v = r;
+            }
+        }
+        std::cout<<v<<std::endl;
+    }
+}
+
+void b(A * d, int l) {
+    q(d,l);
+    x();
+    z();
+    y();
+    h(d,l);
+}
+
+int main() {
+    A a[5];
+    
+    a[0].a=5;
+    a[0].b=1;
+    
+    a[1].a=2;
+    a[1].b=4;
+    
+    a[2].a=3;
+    a[2].b=7;
+    
+    a[3].a=1;
+    a[3].b=6;
+    
+    a[4].a=4;
+    a[4].b=5;
+    
+    b(a,5);
+    return 0;
+}
+    
+    
+                
