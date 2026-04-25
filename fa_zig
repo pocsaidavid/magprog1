@@ -1,0 +1,176 @@
+const std = @import("std");
+
+const Node = struct {
+    value: u8,
+    left: ?*Node = null,
+    right: ?*Node = null,
+};
+
+const LZWTree = struct {
+    root: *Node,
+    current: *Node,
+    allocator: std.mem.Allocator,
+
+    pub fn init(allocator: std.mem.Allocator) !LZWTree {
+        const root = try allocator.create(Node);
+        root.* = Node{ .value = '/', .left = null, .right = null };
+
+        return LZWTree{
+            .root = root,
+            .current = root,
+            .allocator = allocator,
+        };
+    }
+
+    pub fn addBit(self: *LZWTree, bit: u8) !void {
+        if (bit == '0') {
+            if (self.current.left == null) {
+                const n = try self.allocator.create(Node);
+                n.* = Node{ .value = '0', .left = null, .right = null };
+                self.current.left = n;
+                self.current = self.root;
+            } else {
+                self.current = self.current.left.?;
+            }
+        } else {
+            if (self.current.right == null) {
+                const n = try self.allocator.create(Node);
+                n.* = Node{ .value = '1', .left = null, .right = null };
+                self.current.right = n;
+                self.current = self.root;
+            } else {
+                self.current = self.current.right.?;
+            }
+        }
+    }
+
+    fn writeTree(self: *LZWTree, node: ?*Node, depth: usize, writer: anytype) !void {
+        if (node == null) return;
+
+        const n = node.?;
+
+        try self.writeTree(n.right, depth + 1, writer);
+
+        for (0..depth) |_| {
+            try writer.writeAll("---");
+        }
+
+        try writer.print("{c}({d})\n", .{ n.value, depth });
+
+        try self.writeTree(n.left, depth + 1, writer);
+    }
+
+    pub fn save(self: *LZWTree, filename: []const u8) !void {
+        const file = try std.fs.cwd().createFile(filename, .{});
+        defer file.close();
+
+        var writer = file.writer();
+
+        try self.writeTree(self.root, 0, writer);
+
+        const depth = try self.getDepth(self.root, 0);
+        const mean = try self.getMean();
+        const varr = try self.getVariance();
+
+        try writer.print("\ndepth = {d}\n", .{depth});
+        try writer.print("mean = {d}\n", .{mean});
+        try writer.print("var = {d}\n", .{varr});
+    }
+
+    fn getDepth(self: *LZWTree, node: ?*Node, depth: usize) !usize {
+        if (node == null) return depth;
+
+        const n = node.?;
+
+        const l = try self.getDepth(n.left, depth + 1);
+        const r = try self.getDepth(n.right, depth + 1);
+
+        return @max(l, r);
+    }
+
+    fn collectLeaves(self: *LZWTree, node: ?*Node, depth: usize, list: *std.ArrayList(usize)) !void {
+        if (node == null) return;
+
+        const n = node.?;
+
+        if (n.left == null and n.right == null) {
+            try list.append(depth);
+            return;
+        }
+
+        try self.collectLeaves(n.left, depth + 1, list);
+        try self.collectLeaves(n.right, depth + 1, list);
+    }
+
+    pub fn getMean(self: *LZWTree) !f64 {
+        var list = std.ArrayList(usize).init(self.allocator);
+        defer list.deinit();
+
+        try self.collectLeaves(self.root, 0, &list);
+
+        if (list.items.len == 0) return 0;
+
+        var sum: f64 = 0;
+        for (list.items) |v| {
+            sum += @as(f64, @floatFromInt(v));
+        }
+
+        return sum / @as(f64, @floatFromInt(list.items.len));
+    }
+
+    pub fn getVariance(self: *LZWTree) !f64 {
+        var list = std.ArrayList(usize).init(self.allocator);
+        defer list.deinit();
+
+        try self.collectLeaves(self.root, 0, &list);
+
+        if (list.items.len <= 1) return 0;
+
+        var sum: f64 = 0;
+        for (list.items) |v| {
+            sum += @as(f64, @floatFromInt(v));
+        }
+
+        const mean = sum / @as(f64, @floatFromInt(list.items.len));
+
+        var varsum: f64 = 0;
+        for (list.items) |v| {
+            const d = @as(f64, @floatFromInt(v)) - mean;
+            varsum += d * d;
+        }
+
+        return std.math.sqrt(varsum / @as(f64, @floatFromInt(list.items.len - 1)));
+    }
+};
+
+pub fn main() !void {
+    var gpa = std.heap.GeneralPurposeAllocator(.{}){};
+    defer _ = gpa.deinit();
+
+    const allocator = gpa.allocator();
+
+    var tree = try LZWTree.init(allocator);
+
+    const file = try std.fs.cwd().openFile("input.txt", .{});
+    defer file.close();
+
+    var reader = file.reader();
+    var buffer: [1]u8 = undefined;
+
+    while (try reader.read(&buffer) != 0) {
+        const b = buffer[0];
+
+        var i: u8 = 0;
+        while (i < 8) : (i += 1) {
+            if ((b & 0x80) != 0) {
+                try tree.addBit('1');
+            } else {
+                try tree.addBit('0');
+            }
+            // BIT SHIFT HIÁNYZOTT → EZ FONTOS!
+            buffer[0] <<= 1;
+        }
+    }
+
+    try tree.save("output.txt");
+}
