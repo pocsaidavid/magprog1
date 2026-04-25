@@ -1,0 +1,145 @@
+import math
+
+
+# ====== CSOMÓPONT ======
+class Node:
+    def __init__(self, value):
+        self.value = value
+        self.left = None   # '0'
+        self.right = None  # '1'
+
+
+# ====== LZW FA ======
+class LZWTree:
+    def __init__(self):
+        self.root = Node('/')
+        self.current = self.root
+
+    # bit hozzáadása
+    def add_bit(self, bit):
+        if bit == '0':
+            if self.current.left is None:
+                self.current.left = Node('0')
+                self.current = self.root
+            else:
+                self.current = self.current.left
+        else:  # '1'
+            if self.current.right is None:
+                self.current.right = Node('1')
+                self.current = self.root
+            else:
+                self.current = self.current.right
+
+    # ====== FA KIÍRÁSA FÁJLBA ======
+    def save_to_file(self, filename):
+        with open(filename, "w") as f:
+            self._write(self.root, 0, f)
+
+            f.write("\n")
+            f.write(f"depth = {self.get_depth()}\n")
+            f.write(f"mean = {self.get_mean()}\n")
+            f.write(f"var = {self.get_variance()}\n")
+
+    def _write(self, node, depth, f):
+        if node is None:
+            return
+
+        self._write(node.right, depth + 1, f)
+        f.write("---" * depth + f"{node.value}({depth})\n")
+        self._write(node.left, depth + 1, f)
+
+    # ====== MÉLYSÉG ======
+    def get_depth(self):
+        return self._depth(self.root, 0) - 1
+
+    def _depth(self, node, depth):
+        if node is None:
+            return depth
+
+        left = self._depth(node.left, depth + 1)
+        right = self._depth(node.right, depth + 1)
+
+        return max(left, right)
+
+    # ====== LEVELEK ======
+    def _leaf_depths(self, node, depth, result):
+        if node is None:
+            return
+
+        if node.left is None and node.right is None:
+            result.append(depth)
+            return
+
+        self._leaf_depths(node.left, depth + 1, result)
+        self._leaf_depths(node.right, depth + 1, result)
+
+    # ====== ÁTLAG ======
+    def get_mean(self):
+        depths = []
+        self._leaf_depths(self.root, 0, depths)
+
+        return sum(depths) / len(depths) if depths else 0
+
+    # ====== SZÓRÁS ======
+    def get_variance(self):
+        depths = []
+        self._leaf_depths(self.root, 0, depths)
+
+        if len(depths) <= 1:
+            return 0
+
+        mean = sum(depths) / len(depths)
+        variance = sum((d - mean) ** 2 for d in depths) / (len(depths) - 1)
+
+        return math.sqrt(variance)
+
+
+# ====== FŐPROGRAM ======
+def main():
+    input_file = "input.txt"
+    output_file = "output.txt"
+
+    try:
+        with open(input_file, "rb") as f:
+            data = f.read()
+    except FileNotFoundError:
+        print("Nem található az input.txt")
+        return
+
+    tree = LZWTree()
+
+    comment = False
+
+    for byte in data:
+        if byte == 0x0A:  # új sor
+            comment = False
+            continue
+
+        if byte == 0x3E:  # '>'
+            comment = True
+            continue
+
+        if comment:
+            continue
+
+        if byte == 0x4E:  # 'N'
+            continue
+
+        # bájt feldolgozása bitenként
+        for i in range(8):
+            if byte & 0b10000000:
+                tree.add_bit('1')
+            else:
+                tree.add_bit('0')
+
+            byte <<= 1
+            byte &= 0xFF
+
+    # eredmény mentése
+    tree.save_to_file(output_file)
+
+    print("Kész! Az eredmény az output.txt fájlba került.")
+
+
+if __name__ == "__main__":
+    main()
